@@ -59,8 +59,6 @@ export const PROFILE_DATA = {
   headlineAccent: "Resilient Systems",
   headlineBottom: "With Precision.",
   bio: "I am a passionate software engineer and enthusiastic fast learner, eager to explore new technologies and tackle complex problems through innovative, effective solutions. I can make anything happen.",
-  location: "Poris Paradise 3 Blok B 11 No 25, Tangerang, Banten, 15148",
-  locationShort: "Tangerang, Banten 15148",
   email: "antonioryanlie1@gmail.com",
   phone: "085311169058",
   whatsappUrl: "https://wa.me/6285311169058",
@@ -69,7 +67,7 @@ export const PROFILE_DATA = {
   githubUrl: "https://github.com/sherry-21",
   githubDisplay: "github.com/sherry-21",
   cvUrl: "/assets/Antonio_Ryanlie_CV.pdf",
-  portraitCutout: "/assets/profile_cutout.png",
+  portraitCutout: "/assets/profile_cutout_hd.png",
 };
 
 export const HERO_METRICS: MetricItem[] = [
@@ -97,11 +95,11 @@ export const SKILLS_DATA: SkillItem[] = [
     name: "Go (Golang)",
     simType: "golang",
     description:
-      "High-throughput microservices, multi-service data aggregation, and structured Mako template reporting.",
-    context: "Indomobil Group • -76% Query Time",
+      "High throughput microservices, multi service data aggregation, and structured Mako template reporting.",
+    context: "Indomobil Group •  76% Query Time",
     telemetry:
-      "Go (Golang) — Architected event-driven aggregation and reporting microservices, reducing query execution time by 76%.",
-    particles: ["go func()", "chan<-", "-76% latency", "Mako", "WaitGroup"],
+      "Go (Golang) Architected event driven aggregation and reporting microservices, reducing query execution time by 76%.",
+    particles: ["go func()", "chan< ", " 76% latency", "Mako", "WaitGroup"],
   },
   {
     id: "python",
@@ -109,10 +107,10 @@ export const SKILLS_DATA: SkillItem[] = [
     name: "Python",
     simType: "python",
     description:
-      "Monolith-to-microservices migration and end-to-end Role-Based (RBAC) & User-Based (UBAC) access control.",
+      "Monolith to microservices migration and end to end Role Based (RBAC) & User Based (UBAC) access control.",
     context: "Indomobil Management • 253 Menus",
     telemetry:
-      "Python — Engineered end-to-end RBAC & UBAC authorization systems protecting 253 application menus across microservices.",
+      "Python — Engineered end to end RBAC & UBAC authorization systems protecting 253 application menus across microservices.",
     particles: ["RBAC", "UBAC", "253 Menus", "Auth OK", "Microservice"],
   },
   {
@@ -121,10 +119,10 @@ export const SKILLS_DATA: SkillItem[] = [
     name: "Java",
     simType: "springboot",
     description:
-      "Scalable e-commerce backend services, high-availability APIs with Spring Boot, and unit & integration testing.",
-    context: "Blibli.com • 100% On-Scope",
+      "Scalable e-commerce backend services, high availability APIs with Spring Boot, and unit & integration testing.",
+    context: "Blibli.com • 100% On Scope",
     telemetry:
-      "Java & Spring Boot — Delivered optimized backend services with 100% on-scope delivery and full test coverage at Blibli.com.",
+      "Java & Spring Boot — Delivered optimized backend services with 100% on scope delivery and full test coverage at Blibli.com.",
     particles: ["@Service", "Spring Boot", "100% Scope", "JUnit", "REST API"],
   },
   {
@@ -134,7 +132,7 @@ export const SKILLS_DATA: SkillItem[] = [
     simType: "nextjs",
     description:
       "Interactive enterprise interfaces for Indomobil's iMove vehicle manufacturing platform and RBAC/UBAC portals.",
-    context: "iMove Platform • Type-Safe SSR",
+    context: "iMove Platform • Type Safe SSR",
     telemetry:
       "Next.js & TypeScript — Built interactive workflows for iMove vehicle manufacturing and unified access control dashboards.",
     particles: ["Next.js", "TypeScript", "<iMove />", "App Router", "RBAC UI"],
@@ -145,7 +143,7 @@ export const SKILLS_DATA: SkillItem[] = [
     name: "Vue.js",
     simType: "vuejs",
     description:
-      "Translating complex Figma designs into responsive, high-performance storefronts that drive user conversion.",
+      "Translating complex Figma designs into responsive, high performance storefronts that drive user conversion.",
     context: "Blibli.com • ↑ New Tx Users",
     telemetry:
       "Vue.js & JavaScript — Translated Figma UI/UX into responsive storefronts that grew Blibli.com's New Transaction Users.",
@@ -157,10 +155,10 @@ export const SKILLS_DATA: SkillItem[] = [
     name: "RabbitMQ",
     simType: "rabbitmq",
     description:
-      "Asynchronous message broker, event-driven service synchronization, and background job queues.",
+      "Asynchronous message broker, event driven service synchronization, and background job queues.",
     context: "Indomobil Microservices Sync",
     telemetry:
-      "RabbitMQ — Event-driven messaging pipeline synchronizing data updates across distributed services.",
+      "RabbitMQ Event driven messaging pipeline synchronizing data updates across distributed services.",
     particles: ["RabbitMQ", "AMQP", "ACK", "Event Queue", "Exchange"],
   },
   {
@@ -169,10 +167,10 @@ export const SKILLS_DATA: SkillItem[] = [
     name: "Apache Kafka",
     simType: "kafka",
     description:
-      "High-throughput distributed event streaming, log streaming, and decoupled pub/sub architecture.",
+      "High throughput distributed event streaming, log streaming, and decoupled pub/sub architecture.",
     context: "Blibli.com Event Streaming",
     telemetry:
-      "Apache Kafka — Distributed streaming platform powering real-time event topics and decoupled services.",
+      "Apache Kafka Distributed streaming platform powering real time event topics and decoupled services.",
     particles: ["Kafka", "Topics", "Consumer Group", "Partition", "PubSub"],
   },
   {
@@ -181,10 +179,10 @@ export const SKILLS_DATA: SkillItem[] = [
     name: "Redis",
     simType: "redis",
     description:
-      "Sub-millisecond distributed data caching to reduce database pressure and accelerate service response latency.",
-    context: "Sub-millisecond In-Memory Cache",
+      "Sub millisecond distributed data caching to reduce database pressure and accelerate service response latency.",
+    context: "Sub millisecond In Memory Cache",
     telemetry:
-      "Redis — Integrated distributed caching layers at both Indomobil Group and Blibli.com to maximize throughput.",
+      "Redis Integrated distributed caching layers at both Indomobil Group and Blibli.com to maximize throughput.",
     particles: ["CACHE HIT", "0.2ms", "Redis", "SETEX", "Low Latency"],
   },
   {
@@ -196,7 +194,7 @@ export const SKILLS_DATA: SkillItem[] = [
       "Relational database schema modeling, query indexing & optimization, and ACID transaction reliability.",
     context: "Database Architecture & Optimization",
     telemetry:
-      "SQL — Optimized complex queries and designed robust relational database architectures across distributed services.",
+      "SQL Optimized complex queries and designed robust relational database architectures across distributed services.",
     particles: ["SQL", "INDEX", "JOIN", "ACID", "Query Plan"],
   },
 ];
@@ -215,12 +213,12 @@ export const EXPERIENCE_JOURNEY: JourneyMilestone[] = [
       {
         title: "76% Faster Data Aggregation",
         detail:
-          "Architected a Go aggregation service synchronizing multi-service updates via RabbitMQ, cutting query execution time by 76%, alongside a Go & Mako reporting service.",
+          "Architected a Go aggregation service synchronizing multi service updates via RabbitMQ, cutting query execution time by 76%, alongside a Go & Mako reporting service.",
       },
       {
-        title: "End-to-End RBAC & UBAC Security",
+        title: "End to End RBAC & UBAC Security",
         detail:
-          "Designed Role-Based (RBAC) and User-Based Access Control (UBAC) pairing a Python backend with a Next.js frontend, securing and optimizing 253 menus across two services.",
+          "Designed Role Based (RBAC) and User Based Access Control (UBAC) pairing a Python backend with a Next.js frontend, securing and optimizing 253 menus across two services.",
       },
       {
         title: "iMove Manufacturing Platform",
@@ -250,26 +248,26 @@ export const EXPERIENCE_JOURNEY: JourneyMilestone[] = [
     period: "Feb 2024 – Feb 2025",
     location: "Jakarta, Indonesia",
     summary:
-      "Collaborated with a world-class engineering team to ship high-traffic e-commerce features that directly increased Blibli.com’s New Transaction Users with 100% on-scope delivery.",
+      "Collaborated with a world class engineering team to ship high traffic e commerce features that directly increased Blibli.com’s New Transaction Users with 100% on scope delivery.",
     highlights: [
       {
-        title: "High-Performance Storefronts & APIs",
+        title: "High Performance Storefronts & APIs",
         detail:
-          "Translated Figma UI/UX designs into responsive Vue.js features and engineered Java Spring Boot backend services with 100% on-scope delivery.",
+          "Translated Figma UI/UX designs into responsive Vue.js features and engineered Java Spring Boot backend services with 100% on scope delivery.",
       },
       {
-        title: "Event-Driven Scalability",
+        title: "Event Driven Scalability",
         detail:
-          "Integrated Redis for low-latency data caching and Apache Kafka for resilient event-driven messaging across services.",
+          "Integrated Redis for low latency data caching and Apache Kafka for resilient event driven messaging across services.",
       },
       {
         title: "Code Quality & Reliability",
         detail:
-          "Refactored legacy codebases, partnered with QA for cross-stack bug resolution, and authored comprehensive unit and integration test suites.",
+          "Refactored legacy codebases, partnered with QA for cross stack bug resolution, and authored comprehensive unit and integration test suites.",
       },
     ],
     metrics: [
-      { value: "100%", label: "On-Scope Delivery" },
+      { value: "100%", label: "On Scope Delivery" },
       { value: "↑ NTU", label: "New Transaction Users" },
       { value: "E2E", label: "Unit & Integ. Tests" },
     ],
@@ -295,7 +293,7 @@ export const EXPERIENCE_JOURNEY: JourneyMilestone[] = [
       {
         title: "700+ Students Mentored at Dacode",
         detail:
-          "Founded and led a technical bootcamp delivering comprehensive lectures and hands-on mentorship across more than 6 computer science subjects.",
+          "Founded and led a technical bootcamp delivering comprehensive lectures and handson mentorship across more than 6 computer science subjects.",
       },
       {
         title: "Binus University Scholarship Mentor",
@@ -334,14 +332,14 @@ export const ACHIEVEMENTS_DATA: AchievementItem[] = [
     title: "3rd Place — IT Business Case Competition",
     organization: "Satya Wacana Christian University",
     description:
-      "Collaborated with two partners to architect an IT-based business solution addressing complex real-world operational challenges.",
+      "Collaborated with two partners to architect an ITbased business solution addressing complex realworld operational challenges.",
   },
   {
     year: "2022",
     title: "2nd Place — UI/UX Competition",
     organization: "HIMASISKO Sriwijaya University",
     description:
-      "Partnered with two teammates to craft high-usability interface designs and conduct user experience research.",
+      "Partnered with two teammates to craft highusability interface designs and conduct user experience research.",
   },
   {
     year: "2021",

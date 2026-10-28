@@ -1584,9 +1584,17 @@ body {
 }
 
 .signature-copyright {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
   font-size: 0.92rem;
   color: var(--text-stone);
   letter-spacing: 0.01em;
+}
+
+.signature-year {
+  color: var(--text-stone);
 }
 
 .signature-copyright strong {
@@ -1596,8 +1604,20 @@ body {
 }
 
 .signature-sep {
-  margin: 0 10px;
+  margin: 0 2px;
   color: var(--gold-muted);
+}
+
+.signature-phone-link {
+  font-family: var(--font-mono);
+  font-size: 0.86rem;
+  color: var(--gold-champagne);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.signature-phone-link:hover {
+  color: var(--gold-primary);
 }
 
 .signature-links {

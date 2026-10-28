@@ -11,7 +11,7 @@ export function CredentialsSection() {
         <div>
           <div className="section-index-tag">03 / Academic &amp; Honours</div>
           <h2 id="credentials-heading" className="section-display-title">
-            Education &amp; Distinctions
+            Education &amp; Achievements
           </h2>
         </div>
         <p className="section-lead-text">

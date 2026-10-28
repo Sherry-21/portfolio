@@ -52,7 +52,7 @@ export function HeroSection({ onOpenCvModal }: HeroSectionProps) {
 
           <div className="hero-bio-frame">
             <p className="hero-bio-text">
-              Hi, I’m <strong>{PROFILE_DATA.name}</strong> —{" "}
+              Hi, I’m <strong>{PROFILE_DATA.name}</strong>,{" "}
               {PROFILE_DATA.bio}
             </p>
           </div>
@@ -151,8 +151,8 @@ export function HeroSection({ onOpenCvModal }: HeroSectionProps) {
                 src={PROFILE_DATA.portraitCutout}
                 alt={`Portrait of ${PROFILE_DATA.name}, ${PROFILE_DATA.role}`}
                 fetchPriority="high"
-                width={472}
-                height={709}
+                width={848}
+                height={1264}
                 className="portrait-figure-img"
               />
             </div>

@@ -10,21 +10,32 @@ export function ContactFooter() {
       <div className="signature-footer-glow" aria-hidden="true" />
 
       <div className="signature-footer-inner">
-        {/* Top Ornamental Gold Divider with Diamond Crest */}
         <div className="signature-crest-line" aria-hidden="true">
           <span className="signature-line-wing" />
           <span className="signature-diamond" />
           <span className="signature-line-wing" />
         </div>
 
-        {/* Main Row: Copyright & Location on Left, Crafted Links on Right */}
+        {/* Main Row: Copyright & Phone on Left, Crafted Links on Right */}
         <div className="signature-footer-row">
           <div className="signature-identity">
             <span className="signature-dot" aria-hidden="true" />
             <p className="signature-copyright">
-              © 2026 <strong>{PROFILE_DATA.name}</strong>
-              <span className="signature-sep">•</span>
-              <span>{PROFILE_DATA.locationShort}</span>
+              <span className="signature-year" style={{ marginRight: "10px" }}>
+                © 2026
+              </span>{" "}
+              <strong>{PROFILE_DATA.name}</strong>{" "}
+              <span className="signature-sep" style={{ marginRight: "10px" }}>
+                •
+              </span>{" "}
+              <a
+                href={PROFILE_DATA.whatsappUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="signature-phone-link"
+              >
+                {PROFILE_DATA.phone}
+              </a>
             </p>
           </div>
 
