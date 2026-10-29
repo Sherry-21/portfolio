@@ -33,6 +33,7 @@ export function SkillCard({
   const hasFiredSpawnBurstRef = useRef(false);
   const mousePosRef = useRef({ x: 150, y: 120 });
   const entitiesRef = useRef<SpawnedEntity[]>([]);
+  const wakeLoopRef = useRef<(() => void) | null>(null);
 
   const spawnBurst = (originX: number, originY: number, count = 8) => {
     const pool = skill.particles;
@@ -46,14 +47,15 @@ export function SkillCard({
         vy: Math.sin(angle) * speed - 0.5,
         size: 2.5 + Math.random() * 3,
         life: 1.0,
-        decay: 0.014 + Math.random() * 0.013,
+        decay: 0.016 + Math.random() * 0.014,
         label:
           i % 2 === 0 ? pool[Math.floor(Math.random() * pool.length)] : null,
       });
     }
-    if (entitiesRef.current.length > 42) {
-      entitiesRef.current.splice(0, entitiesRef.current.length - 42);
+    if (entitiesRef.current.length > 36) {
+      entitiesRef.current.splice(0, entitiesRef.current.length - 36);
     }
+    wakeLoopRef.current?.();
   };
 
   // Fire a one-time gold particle burst synchronized with the card's staggered spawn delay
@@ -68,7 +70,7 @@ export function SkillCard({
       spawnBurst(
         Math.max(120, rect.width * 0.52),
         Math.max(90, rect.height * 0.44),
-        12
+        10
       );
     }, index * 85 + 220);
 
@@ -85,26 +87,16 @@ export function SkillCard({
 
     let width = 300;
     let height = 240;
-    let tick = Math.random() * 100;
+    let tick = (index + 1) * 14;
+    let frameId = 0;
+    let loopActive = false;
     const goldColor = "#D4AF37";
     const paleGold = "#F3E5AB";
 
-    const resize = () => {
-      const rect = card.getBoundingClientRect();
-      if (rect.width > 0 && rect.height > 0) {
-        width = canvas.width = rect.width;
-        height = canvas.height = rect.height;
-      }
-    };
-
-    resize();
-    window.addEventListener("resize", resize, { passive: true });
-
-    let frameId: number;
-    const render = () => {
+    const drawFrame = () => {
       ctx.clearRect(0, 0, width, height);
       const isHovered = isHoveredRef.current;
-      tick += isHovered ? 0.06 : 0.016;
+      tick += isHovered ? 0.055 : 0.015;
 
       const simType = skill.simType;
       if (simType === "golang") {
@@ -119,7 +111,7 @@ export function SkillCard({
 
           const packetX =
             ((tick * (72 + lane * 20) + lane * 85) % (width + 60)) - 30;
-          ctx.globalAlpha = isHovered ? 0.72 : 0.22;
+          ctx.globalAlpha = isHovered ? 0.72 : 0.2;
           ctx.fillStyle = paleGold;
           ctx.beginPath();
           ctx.roundRect(packetX, y - 2.5, 26, 5, 2.5);
@@ -155,7 +147,7 @@ export function SkillCard({
         }
       } else if (simType === "rabbitmq") {
         ctx.beginPath();
-        for (let x = 0; x <= width; x += 10) {
+        for (let x = 0; x <= width; x += 12) {
           const y = height / 2 + Math.sin(x * 0.035 - tick * 2.2) * 26;
           if (x === 0) ctx.moveTo(x, y);
           else ctx.lineTo(x, y);
@@ -248,16 +240,44 @@ export function SkillCard({
       }
 
       ctx.globalAlpha = 1;
-      frameId = requestAnimationFrame(render);
     };
 
-    frameId = requestAnimationFrame(render);
+    const stepLoop = () => {
+      drawFrame();
+      if (isHoveredRef.current || entitiesRef.current.length > 0) {
+        frameId = requestAnimationFrame(stepLoop);
+      } else {
+        loopActive = false;
+      }
+    };
+
+    const wakeLoop = () => {
+      if (!loopActive) {
+        loopActive = true;
+        frameId = requestAnimationFrame(stepLoop);
+      }
+    };
+
+    wakeLoopRef.current = wakeLoop;
+
+    const resize = () => {
+      const rect = card.getBoundingClientRect();
+      if (rect.width > 0 && rect.height > 0) {
+        width = canvas.width = rect.width;
+        height = canvas.height = rect.height;
+        drawFrame();
+      }
+    };
+
+    resize();
+    window.addEventListener("resize", resize, { passive: true });
 
     return () => {
-      cancelAnimationFrame(frameId);
+      if (frameId) cancelAnimationFrame(frameId);
+      wakeLoopRef.current = null;
       window.removeEventListener("resize", resize);
     };
-  }, [skill]);
+  }, [skill, index]);
 
   const handleMouseEnter = (e: React.MouseEvent<HTMLElement>) => {
     const card = cardRef.current;
@@ -267,7 +287,7 @@ export function SkillCard({
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
     mousePosRef.current = { x, y };
-    spawnBurst(x, y, 10);
+    spawnBurst(x, y, 8);
     onActivate(skill.telemetry);
   };
 
@@ -280,7 +300,7 @@ export function SkillCard({
     mousePosRef.current = { x, y };
     card.style.setProperty("--mouse-x", `${x}px`);
     card.style.setProperty("--mouse-y", `${y}px`);
-    if (Math.random() < 0.28) {
+    if (Math.random() < 0.22) {
       spawnBurst(x, y, 2);
     }
   };
@@ -291,7 +311,7 @@ export function SkillCard({
 
   const handleFocus = () => {
     isHoveredRef.current = true;
-    spawnBurst(150, 120, 10);
+    spawnBurst(150, 120, 8);
     onActivate(skill.telemetry);
   };
 

@@ -7,13 +7,16 @@ import { scrollIntoViewAsync } from "@/utils/smoothScroll";
 export function ExperienceJourney() {
   const [chronological, setChronological] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
-  const [spineProgress, setSpineProgress] = useState(0.15);
   const [sectionInView, setSectionInView] = useState(false);
   const [spawnedIds, setSpawnedIds] = useState<Record<string, boolean>>({});
 
   const sectionRef = useRef<HTMLElement>(null);
   const timelineRef = useRef<HTMLDivElement>(null);
+  const spineRailRef = useRef<HTMLDivElement>(null);
+  const spineFillRef = useRef<HTMLDivElement>(null);
+  const spineTravelerRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<(HTMLElement | null)[]>([]);
+  const activeIndexRef = useRef(0);
 
   const milestones = useMemo(() => {
     return chronological
@@ -47,18 +50,56 @@ export function ExperienceJourney() {
       "(prefers-reduced-motion: reduce)"
     ).matches;
 
-    // Continuous scroll-linked spine & active milestone tracking every time user scrolls
-    const updateJourneyOnScroll = () => {
+    let targetProgress = 0.08;
+    let currentProgress = 0.08;
+    let railHeight = 1;
+    let rafId = 0;
+    let isSpineAnimating = false;
+
+    const applySpineTransform = (progress: number) => {
+      if (spineFillRef.current) {
+        spineFillRef.current.style.transform = `scaleY(${progress.toFixed(4)})`;
+      }
+      if (spineTravelerRef.current) {
+        const yPx = progress * railHeight;
+        spineTravelerRef.current.style.transform = `translate3d(0, ${yPx.toFixed(2)}px, 0)`;
+      }
+    };
+
+    const tickSpine = () => {
+      const diff = targetProgress - currentProgress;
+      if (Math.abs(diff) <= 0.0006 || prefersReducedMotion) {
+        currentProgress = targetProgress;
+        applySpineTransform(currentProgress);
+        isSpineAnimating = false;
+        return;
+      }
+
+      // Smooth frame-by-frame interpolation for the sliding gold bar & traveler orb
+      currentProgress += diff * 0.16;
+      applySpineTransform(currentProgress);
+      rafId = requestAnimationFrame(tickSpine);
+    };
+
+    const updateJourneyMetrics = () => {
       const container = timelineRef.current;
       if (!container) return;
 
       const rect = container.getBoundingClientRect();
-      const viewportCenter = window.innerHeight * 0.52;
+      if (spineRailRef.current) {
+        railHeight = Math.max(1, spineRailRef.current.clientHeight);
+      } else {
+        railHeight = Math.max(1, rect.height - 24);
+      }
 
-      // Calculate how far the viewport center has traveled through the timeline container
-      const rawProgress = (viewportCenter - rect.top) / Math.max(1, rect.height);
-      const clampedProgress = Math.max(0.04, Math.min(1, rawProgress));
-      setSpineProgress(clampedProgress);
+      const viewportFocalY = window.innerHeight * 0.54;
+      const rawProgress = (viewportFocalY - rect.top) / Math.max(1, rect.height);
+      targetProgress = Math.max(0.04, Math.min(1, rawProgress));
+
+      if (!isSpineAnimating) {
+        isSpineAnimating = true;
+        rafId = requestAnimationFrame(tickSpine);
+      }
 
       // Find which milestone card is closest to the reading focal zone
       let closestIdx = 0;
@@ -68,14 +109,17 @@ export function ExperienceJourney() {
         if (!el) return;
         const itemRect = el.getBoundingClientRect();
         const itemCenter = itemRect.top + itemRect.height * 0.38;
-        const dist = Math.abs(itemCenter - viewportCenter);
+        const dist = Math.abs(itemCenter - viewportFocalY);
         if (dist < minDistance) {
           minDistance = dist;
           closestIdx = idx;
         }
       });
 
-      setActiveIndex(closestIdx);
+      if (closestIdx !== activeIndexRef.current) {
+        activeIndexRef.current = closestIdx;
+        setActiveIndex(closestIdx);
+      }
     };
 
     // One-time IntersectionObserver for in-view milestone spawn animation
@@ -105,20 +149,22 @@ export function ExperienceJourney() {
       if (el) observer.observe(el);
     });
 
-    updateJourneyOnScroll();
-    window.addEventListener("scroll", updateJourneyOnScroll, { passive: true });
-    window.addEventListener("resize", updateJourneyOnScroll, { passive: true });
+    updateJourneyMetrics();
+    window.addEventListener("scroll", updateJourneyMetrics, { passive: true });
+    window.addEventListener("resize", updateJourneyMetrics, { passive: true });
 
     return () => {
       observer.disconnect();
-      window.removeEventListener("scroll", updateJourneyOnScroll);
-      window.removeEventListener("resize", updateJourneyOnScroll);
+      if (rafId) cancelAnimationFrame(rafId);
+      window.removeEventListener("scroll", updateJourneyMetrics);
+      window.removeEventListener("resize", updateJourneyMetrics);
     };
   }, [milestones]);
 
   const scrollToMilestone = async (index: number) => {
     const target = itemRefs.current[index];
     if (!target) return;
+    activeIndexRef.current = index;
     setActiveIndex(index);
     await scrollIntoViewAsync(target, { behavior: "smooth", block: "center" });
     const card = target.querySelector<HTMLElement>(".journey-card");
@@ -182,32 +228,29 @@ export function ExperienceJourney() {
           onClick={() => setChronological((prev) => !prev)}
           className="journey-order-btn"
         >
-          <span>Order: {chronological ? "2022 → Present" : "Present → 2022"}</span>
+          <span>
+            Order: {chronological ? "2022 → Present" : "Present → 2022"}
+          </span>
         </button>
       </div>
 
       {/* Scroll-Driven Vertical Timeline */}
       <div ref={timelineRef} className="journey-timeline-track">
-        {/* Background & Animated Liquid Gold Spine */}
-        <div className="journey-spine-rail" aria-hidden="true">
-          <div
-            className="journey-spine-fill"
-            style={{ transform: `scaleY(${spineProgress})` }}
-          />
-          <div
-            className="journey-spine-traveler"
-            style={{ top: `${spineProgress * 100}%` }}
-          />
+        {/* Background & Butter-Smooth GPU-Composited Liquid Gold Spine */}
+        <div
+          ref={spineRailRef}
+          className="journey-spine-rail"
+          aria-hidden="true"
+        >
+          <div ref={spineFillRef} className="journey-spine-fill" />
+          <div ref={spineTravelerRef} className="journey-spine-traveler" />
         </div>
 
         {/* Summarized Milestone Chapters */}
         <div className="journey-milestones-list">
           {milestones.map((item, idx) => {
             const isActive = idx === activeIndex;
-            const isPassed =
-              idx <= activeIndex ||
-              spineProgress >= (idx + 0.5) / milestones.length;
-
+            const isPassed = idx <= activeIndex;
             const isSpawned = Boolean(spawnedIds[item.id]);
 
             return (

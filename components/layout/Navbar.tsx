@@ -5,10 +5,10 @@ import { PROFILE_DATA } from "@/data/portfolioData";
 import { smoothScrollToSection } from "@/utils/smoothScroll";
 
 const NAV_ITEMS = [
-  { id: "about", label: "Home" },
+  { id: "about", label: "About" },
   { id: "skills", label: "Skills" },
-  { id: "journey", label: "Experience" },
-  { id: "credentials", label: "Credentials" },
+  { id: "experience", label: "Experience" },
+  { id: "education", label: "Education" },
   { id: "contact", label: "Contact" },
 ];
 
