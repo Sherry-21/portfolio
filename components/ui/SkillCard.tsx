@@ -30,7 +30,6 @@ export function SkillCard({
   const cardRef = useRef<HTMLElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const isHoveredRef = useRef(false);
-  const hasFiredSpawnBurstRef = useRef(false);
   const mousePosRef = useRef({ x: 150, y: 120 });
   const entitiesRef = useRef<SpawnedEntity[]>([]);
   const wakeLoopRef = useRef<(() => void) | null>(null);
@@ -57,25 +56,6 @@ export function SkillCard({
     }
     wakeLoopRef.current?.();
   };
-
-  // Fire a one-time gold particle burst synchronized with the card's staggered spawn delay
-  useEffect(() => {
-    if (!isSpawned || hasFiredSpawnBurstRef.current) return;
-    hasFiredSpawnBurstRef.current = true;
-
-    const card = cardRef.current;
-    const burstTimer = setTimeout(() => {
-      if (!card) return;
-      const rect = card.getBoundingClientRect();
-      spawnBurst(
-        Math.max(120, rect.width * 0.52),
-        Math.max(90, rect.height * 0.44),
-        10
-      );
-    }, index * 85 + 220);
-
-    return () => clearTimeout(burstTimer);
-  }, [isSpawned, index, skill]);
 
   useEffect(() => {
     const card = cardRef.current;
@@ -261,10 +241,11 @@ export function SkillCard({
     wakeLoopRef.current = wakeLoop;
 
     const resize = () => {
-      const rect = card.getBoundingClientRect();
-      if (rect.width > 0 && rect.height > 0) {
-        width = canvas.width = rect.width;
-        height = canvas.height = rect.height;
+      const w = card.clientWidth;
+      const h = card.clientHeight;
+      if (w > 0 && h > 0) {
+        width = canvas.width = w;
+        height = canvas.height = h;
         drawFrame();
       }
     };
@@ -326,7 +307,7 @@ export function SkillCard({
       onBlur={handleMouseLeave}
       style={
         {
-          "--spawn-delay": `${index * 85}ms`,
+          "--spawn-delay": `${index * 75}ms`,
         } as React.CSSProperties
       }
       className={`skill-card spawn-item ${isSpawned ? "is-spawned" : ""}`}

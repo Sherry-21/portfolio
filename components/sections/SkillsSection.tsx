@@ -8,49 +8,55 @@ export function SkillsSection() {
   const [telemetry, setTelemetry] = useState<string>(
     "Hover or focus on any capability card above to inspect production impact."
   );
-  const [sectionInView, setSectionInView] = useState(false);
-  const [gridSpawned, setGridSpawned] = useState(false);
+  const [sectionVisible, setSectionVisible] = useState(false);
+  const [gridVisible, setGridVisible] = useState(false);
+
   const sectionRef = useRef<HTMLElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const el = sectionRef.current;
-    if (!el) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setSectionInView(true);
-            observer.disconnect();
-          }
-        });
-      },
-      { threshold: 0.12, rootMargin: "0px 0px -60px 0px" }
-    );
-
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
-
-  useEffect(() => {
+    const sectionEl = sectionRef.current;
     const gridEl = gridRef.current;
-    if (!gridEl) return;
+    if (!sectionEl || !gridEl) return;
+
+    const prefersReducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches;
+
+    if (prefersReducedMotion) {
+      setSectionVisible(true);
+      setGridVisible(true);
+      return;
+    }
+
+    const sectionObserver = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting) {
+          setSectionVisible(true);
+          sectionObserver.disconnect();
+        }
+      },
+      { threshold: 0.05, rootMargin: "0px 0px -30px 0px" }
+    );
 
     const gridObserver = new IntersectionObserver(
       (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setGridSpawned(true);
-            gridObserver.disconnect();
-          }
-        });
+        if (entries[0]?.isIntersecting) {
+          setGridVisible(true);
+          gridObserver.disconnect();
+        }
       },
-      { threshold: 0.15, rootMargin: "0px 0px -80px 0px" }
+      // Require the top of the grid to be 70px into the viewport before cards spawn
+      { threshold: 0.1, rootMargin: "0px 0px -70px 0px" }
     );
 
+    sectionObserver.observe(sectionEl);
     gridObserver.observe(gridEl);
-    return () => gridObserver.disconnect();
+
+    return () => {
+      sectionObserver.disconnect();
+      gridObserver.disconnect();
+    };
   }, []);
 
   return (
@@ -58,7 +64,7 @@ export function SkillsSection() {
       id="skills"
       ref={sectionRef}
       className={`luxury-stage section-container spawn-section ${
-        sectionInView ? "is-in-view" : ""
+        sectionVisible ? "is-in-view" : ""
       }`}
       aria-labelledby="skills-heading"
     >
@@ -75,14 +81,14 @@ export function SkillsSection() {
         </p>
       </div>
 
-      {/* Interactive Hover-Spawned Skill Cards Grid (9 core points) */}
+      {/* Pre-rendered Skill Cards Grid (Cascades into view when scrolled to) */}
       <div ref={gridRef} className="skills-cards-grid">
         {SKILLS_DATA.map((skill, idx) => (
           <SkillCard
             key={skill.id}
             skill={skill}
             index={idx}
-            isSpawned={gridSpawned}
+            isSpawned={gridVisible}
             onActivate={setTelemetry}
           />
         ))}

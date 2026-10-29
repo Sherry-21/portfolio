@@ -575,91 +575,34 @@ body {
   animation: scroll-arrival-pulse 0.9s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-/* Section Header & Toolbar One-Time In-View Spawn Keyframes */
-@keyframes section-header-spawn {
-  0% {
-    opacity: 0;
-    transform: translateY(28px);
-    filter: blur(4px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-    filter: blur(0);
-  }
-}
-
-@keyframes skill-card-spawn-in {
-  0% {
-    opacity: 0;
-    transform: translateY(44px) scale(0.88);
-    filter: blur(6px);
-    border-color: rgba(212, 175, 55, 0.05);
-    box-shadow: 0 0 0 rgba(212, 175, 55, 0);
-  }
-  60% {
-    opacity: 1;
-    transform: translateY(-4px) scale(1.015);
-    filter: blur(0);
-    border-color: rgba(243, 229, 171, 0.55);
-    box-shadow:
-      0 18px 36px -14px rgba(0, 0, 0, 0.78),
-      0 0 28px -6px rgba(212, 175, 55, 0.28);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-    filter: blur(0);
-    border-color: var(--border-subtle);
-    box-shadow: none;
-  }
-}
-
-@keyframes skill-monogram-pop {
-  0% {
-    opacity: 0;
-    transform: scale(0.6) rotate(-10deg);
-  }
-  70% {
-    opacity: 1;
-    transform: scale(1.1) rotate(2deg);
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1) rotate(0deg);
-  }
-}
-
-@keyframes skill-content-rise {
-  0% {
-    opacity: 0;
-    transform: translateY(14px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
+/* Pre-Rendered GPU Visibility Reveal (Zero blur / Zero text re-rasterization) */
 .spawn-section .spawn-header,
 .spawn-section .spawn-toolbar,
 .spawn-section .spawn-footer-bar {
   opacity: 0;
-  transform: translateY(28px);
+  transform: translate3d(0, 24px, 0);
+  will-change: transform, opacity;
+  transition:
+    opacity 0.55s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.55s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .spawn-section.is-in-view .spawn-header {
-  animation: section-header-spawn 0.68s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+  transition-delay: 0ms;
 }
 
 .spawn-section.is-in-view .spawn-toolbar {
-  animation: section-header-spawn 0.68s cubic-bezier(0.22, 1, 0.36, 1) 110ms
-    forwards;
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+  transition-delay: 80ms;
 }
 
 .spawn-section.is-in-view .spawn-footer-bar {
-  animation: section-header-spawn 0.68s cubic-bezier(0.22, 1, 0.36, 1) 420ms
-    forwards;
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+  transition-delay: 240ms;
 }
 
 .skills-cards-grid {
@@ -680,42 +623,63 @@ body {
   flex-direction: column;
   justify-content: space-between;
   min-height: 235px;
+  contain: layout paint;
+  will-change: transform, opacity;
   transition:
-    transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
-    border-color 0.3s ease,
-    background 0.3s ease,
-    box-shadow 0.3s ease;
+    opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.65s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.25s ease,
+    background 0.25s ease;
 }
 
 .skill-card.spawn-item {
   opacity: 0;
-  transform: translateY(44px) scale(0.88);
+  transform: translate3d(0, 48px, 0) scale(0.9);
+  transition-delay: var(--spawn-delay, 0ms);
 }
 
 .skill-card.spawn-item.is-spawned {
-  animation: skill-card-spawn-in 0.76s cubic-bezier(0.22, 1, 0.36, 1)
-    var(--spawn-delay, 0ms) forwards;
+  opacity: 1;
+  transform: translate3d(0, 0, 0) scale(1);
 }
 
-.skill-card.spawn-item .skill-code-monogram,
-.skill-card.spawn-item .skill-card-body,
-.skill-card.spawn-item .skill-card-footer {
+/* Pre-rendered monogram pop & GPU diagonal gold sheen sweep on spawn */
+.skill-card.spawn-item .skill-code-monogram {
   opacity: 0;
+  transform: translate3d(-8px, 8px, 0) scale(0.72);
+  will-change: transform, opacity;
+  transition:
+    opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.55s cubic-bezier(0.16, 1, 0.3, 1),
+    background 0.3s ease;
+  transition-delay: calc(var(--spawn-delay, 0ms) + 85ms);
 }
 
 .skill-card.spawn-item.is-spawned .skill-code-monogram {
-  animation: skill-monogram-pop 0.58s cubic-bezier(0.22, 1, 0.36, 1)
-    calc(var(--spawn-delay, 0ms) + 110ms) forwards;
+  opacity: 1;
+  transform: translate3d(0, 0, 0) scale(1);
 }
 
-.skill-card.spawn-item.is-spawned .skill-card-body {
-  animation: skill-content-rise 0.56s cubic-bezier(0.22, 1, 0.36, 1)
-    calc(var(--spawn-delay, 0ms) + 180ms) forwards;
+.skill-card.spawn-item::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    115deg,
+    transparent 20%,
+    rgba(243, 229, 171, 0.16) 50%,
+    transparent 80%
+  );
+  transform: translate3d(-135%, 0, 0);
+  will-change: transform;
+  pointer-events: none;
+  z-index: 3;
+  transition: transform 0.85s cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: calc(var(--spawn-delay, 0ms) + 70ms);
 }
 
-.skill-card.spawn-item.is-spawned .skill-card-footer {
-  animation: skill-content-rise 0.56s cubic-bezier(0.22, 1, 0.36, 1)
-    calc(var(--spawn-delay, 0ms) + 250ms) forwards;
+.skill-card.spawn-item.is-spawned::after {
+  transform: translate3d(145%, 0, 0);
 }
 
 .skill-card::before {
@@ -736,7 +700,8 @@ body {
 .skill-card.spawn-item.is-spawned:focus-visible,
 .skill-card:hover,
 .skill-card:focus-visible {
-  transform: translateY(-5px) scale(1);
+  transform: translate3d(0, -5px, 0) scale(1);
+  transition-delay: 0ms;
   background: var(--surface-card-hover);
   border-color: var(--gold-border-strong);
   box-shadow:
@@ -771,14 +736,11 @@ body {
   .spawn-section .spawn-toolbar,
   .spawn-section .spawn-footer-bar,
   .skill-card.spawn-item,
-  .skill-card.spawn-item .skill-code-monogram,
-  .skill-card.spawn-item .skill-card-body,
-  .skill-card.spawn-item .skill-card-footer {
+  .skill-card.spawn-item .skill-code-monogram {
     animation: none !important;
     transition: none !important;
     opacity: 1 !important;
     transform: none !important;
-    filter: none !important;
   }
 }
 
@@ -1070,35 +1032,6 @@ body {
   gap: 32px;
 }
 
-@keyframes journey-milestone-spawn {
-  0% {
-    opacity: 0;
-    transform: translateY(42px) scale(0.94);
-    filter: blur(5px);
-  }
-  65% {
-    opacity: 1;
-    transform: translateY(-3px) scale(1.005);
-    filter: blur(0);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-    filter: blur(0);
-  }
-}
-
-@keyframes journey-child-spawn {
-  0% {
-    opacity: 0;
-    transform: translateY(16px) scale(0.94);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
 .journey-milestone-row {
   position: relative;
   display: grid;
@@ -1106,40 +1039,72 @@ body {
   gap: 24px;
   align-items: start;
   opacity: 0;
-  transform: translateY(42px) scale(0.94);
+  transform: translate3d(0, 48px, 0);
+  will-change: transform, opacity;
+  transition:
+    opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .journey-milestone-row.is-spawned {
-  animation: journey-milestone-spawn 0.78s cubic-bezier(0.22, 1, 0.36, 1)
-    forwards;
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
 }
 
-/* Staggered child reveal inside each journey milestone when spawned in view */
-.journey-milestone-row .journey-stat-chip,
-.journey-milestone-row .journey-highlight-box,
-.journey-milestone-row .journey-tech-pill {
+.journey-milestone-row .journey-card {
+  transform: translate3d(14px, 0, 0);
+  transition:
+    transform 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.35s ease,
+    background 0.35s ease,
+    box-shadow 0.35s ease;
+}
+
+.journey-milestone-row.is-spawned .journey-card {
+  transform: translate3d(0, 0, 0);
+}
+
+/* Staggered GPU highlight box animation inside each milestone card */
+.journey-milestone-row .journey-highlight-box {
   opacity: 0;
-  transform: translateY(16px) scale(0.94);
+  transform: translate3d(0, 20px, 0);
+  transition:
+    opacity 0.55s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+  transition-delay: calc(180ms + var(--hl-idx, 0) * 90ms);
 }
 
-.journey-milestone-row.is-spawned .journey-stat-chip,
-.journey-milestone-row.is-spawned .journey-highlight-box,
-.journey-milestone-row.is-spawned .journey-tech-pill {
-  animation: journey-child-spawn 0.54s cubic-bezier(0.22, 1, 0.36, 1)
-    calc(180ms + var(--item-idx, 0) * 60ms) forwards;
+.journey-milestone-row.is-spawned .journey-highlight-box {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+/* Timeline node crest spring pop */
+.journey-milestone-row .journey-node-crest {
+  opacity: 0;
+  transform: scale(0.4);
+  transition:
+    transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 120ms,
+    opacity 0.4s ease 100ms,
+    border-color 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.journey-milestone-row.is-spawned .journey-node-crest {
+  opacity: 1;
+  transform: scale(1);
 }
 
 /* Mandatory Copy-Paste Safety for motion-sensitive users */
 @media (prefers-reduced-motion: reduce) {
   .journey-milestone-row,
-  .journey-milestone-row .journey-stat-chip,
-  .journey-milestone-row .journey-highlight-box,
-  .journey-milestone-row .journey-tech-pill {
+  .journey-milestone-row .journey-card,
+  .journey-milestone-row .journey-node-crest,
+  .journey-milestone-row .journey-highlight-box {
     animation: none !important;
     transition: none !important;
     opacity: 1 !important;
     transform: none !important;
-    filter: none !important;
     translate: 0 0 !important;
   }
 }

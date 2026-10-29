@@ -7,8 +7,8 @@ import { scrollIntoViewAsync } from "@/utils/smoothScroll";
 export function ExperienceJourney() {
   const [chronological, setChronological] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
-  const [sectionInView, setSectionInView] = useState(false);
-  const [spawnedIds, setSpawnedIds] = useState<Record<string, boolean>>({});
+  const [headerVisible, setHeaderVisible] = useState(false);
+  const [spawnedMilestones, setSpawnedMilestones] = useState<Record<string, boolean>>({});
 
   const sectionRef = useRef<HTMLElement>(null);
   const timelineRef = useRef<HTMLDivElement>(null);
@@ -24,27 +24,71 @@ export function ExperienceJourney() {
       : EXPERIENCE_JOURNEY;
   }, [chronological]);
 
-  // Observe section header & toolbar for one-time in-view spawn reveal
+  // Section header spawn observer (fires when user scrolls near the section)
   useEffect(() => {
     const el = sectionRef.current;
     if (!el) return;
 
-    const sectionObserver = new IntersectionObserver(
+    const prefersReducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches;
+
+    if (prefersReducedMotion) {
+      setHeaderVisible(true);
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting) {
+          setHeaderVisible(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.05, rootMargin: "0px 0px -40px 0px" }
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  // Individual milestone spawn observer (each milestone animates in as user scrolls to it)
+  useEffect(() => {
+    const prefersReducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches;
+
+    if (prefersReducedMotion) {
+      const all: Record<string, boolean> = {};
+      milestones.forEach((m) => (all[m.id] = true));
+      setSpawnedMilestones(all);
+      return;
+    }
+
+    const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            setSectionInView(true);
-            sectionObserver.disconnect();
+            const id = (entry.target as HTMLElement).dataset.milestoneId;
+            if (id) {
+              setSpawnedMilestones((prev) => (prev[id] ? prev : { ...prev, [id]: true }));
+            }
+            observer.unobserve(entry.target);
           }
         });
       },
-      { threshold: 0.12, rootMargin: "0px 0px -60px 0px" }
+      // Require element to be 80px into the viewport so the user clearly sees the animation
+      { threshold: 0.12, rootMargin: "0px 0px -80px 0px" }
     );
 
-    sectionObserver.observe(el);
-    return () => sectionObserver.disconnect();
-  }, []);
+    itemRefs.current.forEach((el) => {
+      if (el) observer.observe(el);
+    });
 
+    return () => observer.disconnect();
+  }, [milestones]);
+
+  // Butter-smooth GPU spine progress tracking on scroll
   useEffect(() => {
     const prefersReducedMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)"
@@ -75,7 +119,6 @@ export function ExperienceJourney() {
         return;
       }
 
-      // Smooth frame-by-frame interpolation for the sliding gold bar & traveler orb
       currentProgress += diff * 0.16;
       applySpineTransform(currentProgress);
       rafId = requestAnimationFrame(tickSpine);
@@ -101,7 +144,7 @@ export function ExperienceJourney() {
         rafId = requestAnimationFrame(tickSpine);
       }
 
-      // Find which milestone card is closest to the reading focal zone
+      // Check focal distance for active chapter
       let closestIdx = 0;
       let minDistance = Infinity;
 
@@ -122,39 +165,11 @@ export function ExperienceJourney() {
       }
     };
 
-    // One-time IntersectionObserver for in-view milestone spawn animation
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          const target = entry.target as HTMLElement;
-          const milestoneId = target.dataset.milestoneId;
-
-          if (entry.isIntersecting || prefersReducedMotion) {
-            if (milestoneId) {
-              setSpawnedIds((prev) =>
-                prev[milestoneId] ? prev : { ...prev, [milestoneId]: true }
-              );
-            }
-            observer.unobserve(target);
-          }
-        });
-      },
-      {
-        threshold: 0.14,
-        rootMargin: "0px 0px -70px 0px",
-      }
-    );
-
-    itemRefs.current.forEach((el) => {
-      if (el) observer.observe(el);
-    });
-
     updateJourneyMetrics();
     window.addEventListener("scroll", updateJourneyMetrics, { passive: true });
     window.addEventListener("resize", updateJourneyMetrics, { passive: true });
 
     return () => {
-      observer.disconnect();
       if (rafId) cancelAnimationFrame(rafId);
       window.removeEventListener("scroll", updateJourneyMetrics);
       window.removeEventListener("resize", updateJourneyMetrics);
@@ -181,7 +196,7 @@ export function ExperienceJourney() {
       ref={sectionRef}
       id="journey"
       className={`luxury-stage section-container spawn-section ${
-        sectionInView ? "is-in-view" : ""
+        headerVisible ? "is-in-view" : ""
       }`}
       aria-labelledby="journey-heading"
     >
@@ -246,12 +261,12 @@ export function ExperienceJourney() {
           <div ref={spineTravelerRef} className="journey-spine-traveler" />
         </div>
 
-        {/* Summarized Milestone Chapters */}
+        {/* Milestone Chapters (Each spawns as scrolled into view) */}
         <div className="journey-milestones-list">
           {milestones.map((item, idx) => {
             const isActive = idx === activeIndex;
             const isPassed = idx <= activeIndex;
-            const isSpawned = Boolean(spawnedIds[item.id]);
+            const isSpawned = Boolean(spawnedMilestones[item.id]);
 
             return (
               <article
@@ -297,16 +312,8 @@ export function ExperienceJourney() {
 
                     {/* Key Quantified Metrics */}
                     <div className="journey-metrics-cluster">
-                      {item.metrics.map((metric, mIdx) => (
-                        <div
-                          key={metric.label}
-                          className="journey-stat-chip"
-                          style={
-                            {
-                              "--item-idx": mIdx,
-                            } as React.CSSProperties
-                          }
-                        >
+                      {item.metrics.map((metric) => (
+                        <div key={metric.label} className="journey-stat-chip">
                           <div className="journey-stat-val">{metric.value}</div>
                           <div className="journey-stat-lbl">{metric.label}</div>
                         </div>
@@ -324,7 +331,7 @@ export function ExperienceJourney() {
                         className="journey-highlight-box"
                         style={
                           {
-                            "--item-idx": hlIdx,
+                            "--hl-idx": hlIdx,
                           } as React.CSSProperties
                         }
                       >
@@ -336,16 +343,8 @@ export function ExperienceJourney() {
 
                   {/* Stack Pills */}
                   <div className="journey-stack-row">
-                    {item.stack.map((tech, tIdx) => (
-                      <span
-                        key={tech}
-                        className="journey-tech-pill"
-                        style={
-                          {
-                            "--item-idx": tIdx,
-                          } as React.CSSProperties
-                        }
-                      >
+                    {item.stack.map((tech) => (
+                      <span key={tech} className="journey-tech-pill">
                         {tech}
                       </span>
                     ))}
