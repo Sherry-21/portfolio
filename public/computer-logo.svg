@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <rect width="64" height="64" rx="14" fill="#0B0B0E"/>
+  <rect x="2" y="2" width="60" height="60" rx="12" stroke="#D4AF37" stroke-opacity="0.45" stroke-width="2"/>
+  <!-- Computer Monitor Screen -->
+  <rect x="11" y="13" width="42" height="28" rx="4" fill="#141418" stroke="#D4AF37" stroke-width="2.5"/>
+  <!-- Code Prompt Inside Monitor -->
+  <path d="M21 23L26 27L21 31" stroke="#F3E5AB" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <line x1="29" y1="31" x2="36" y2="31" stroke="#D4AF37" stroke-width="2.5" stroke-linecap="round"/>
+  <!-- Monitor Stand & Base -->
+  <path d="M27 41L25 49H39L37 41" stroke="#D4AF37" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <line x1="20" y1="49" x2="44" y2="49" stroke="#F3E5AB" stroke-width="2.5" stroke-linecap="round"/>
+</svg>

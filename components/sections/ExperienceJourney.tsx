@@ -2,12 +2,16 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { EXPERIENCE_JOURNEY } from "@/data/portfolioData";
+import { scrollIntoViewAsync } from "@/utils/smoothScroll";
 
 export function ExperienceJourney() {
   const [chronological, setChronological] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
   const [spineProgress, setSpineProgress] = useState(0.15);
+  const [sectionInView, setSectionInView] = useState(false);
+  const [spawnedIds, setSpawnedIds] = useState<Record<string, boolean>>({});
 
+  const sectionRef = useRef<HTMLElement>(null);
   const timelineRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<(HTMLElement | null)[]>([]);
 
@@ -16,6 +20,27 @@ export function ExperienceJourney() {
       ? [...EXPERIENCE_JOURNEY].reverse()
       : EXPERIENCE_JOURNEY;
   }, [chronological]);
+
+  // Observe section header & toolbar for one-time in-view spawn reveal
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+
+    const sectionObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setSectionInView(true);
+            sectionObserver.disconnect();
+          }
+        });
+      },
+      { threshold: 0.12, rootMargin: "0px 0px -60px 0px" }
+    );
+
+    sectionObserver.observe(el);
+    return () => sectionObserver.disconnect();
+  }, []);
 
   useEffect(() => {
     const prefersReducedMotion = window.matchMedia(
@@ -53,31 +78,26 @@ export function ExperienceJourney() {
       setActiveIndex(closestIdx);
     };
 
-    // Multi-threshold IntersectionObserver for smooth scroll-driven card transforms (every scroll up or down)
-    const thresholds = Array.from({ length: 41 }, (_, i) => i / 40);
-    const supportsNativeViewTimeline = CSS.supports(
-      "(animation-timeline: scroll()) and (animation-range: 0% 100%)"
-    );
-
+    // One-time IntersectionObserver for in-view milestone spawn animation
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           const target = entry.target as HTMLElement;
-          const ratio = entry.intersectionRatio;
-          target.style.setProperty("--scroll-ratio", ratio.toFixed(3));
+          const milestoneId = target.dataset.milestoneId;
 
-          if (!prefersReducedMotion && !supportsNativeViewTimeline) {
-            const clamped = Math.min(1, Math.max(0, ratio * 1.65));
-            const scale = 0.96 + clamped * 0.04;
-            const translateY = (1 - clamped) * 26;
-            target.style.opacity = `${0.25 + clamped * 0.75}`;
-            target.style.transform = `translateY(${translateY}px) scale(${scale})`;
+          if (entry.isIntersecting || prefersReducedMotion) {
+            if (milestoneId) {
+              setSpawnedIds((prev) =>
+                prev[milestoneId] ? prev : { ...prev, [milestoneId]: true }
+              );
+            }
+            observer.unobserve(target);
           }
         });
       },
       {
-        threshold: thresholds,
-        rootMargin: "-6% 0px -8% 0px",
+        threshold: 0.14,
+        rootMargin: "0px 0px -70px 0px",
       }
     );
 
@@ -96,19 +116,30 @@ export function ExperienceJourney() {
     };
   }, [milestones]);
 
-  const scrollToMilestone = (index: number) => {
+  const scrollToMilestone = async (index: number) => {
     const target = itemRefs.current[index];
     if (!target) return;
-    target.scrollIntoView({ behavior: "smooth", block: "center" });
+    setActiveIndex(index);
+    await scrollIntoViewAsync(target, { behavior: "smooth", block: "center" });
+    const card = target.querySelector<HTMLElement>(".journey-card");
+    if (card) {
+      card.classList.add("scroll-arrived-glow");
+      window.setTimeout(() => {
+        card.classList.remove("scroll-arrived-glow");
+      }, 950);
+    }
   };
 
   return (
     <section
+      ref={sectionRef}
       id="journey"
-      className="luxury-stage section-container"
+      className={`luxury-stage section-container spawn-section ${
+        sectionInView ? "is-in-view" : ""
+      }`}
       aria-labelledby="journey-heading"
     >
-      <div className="section-header-row">
+      <div className="section-header-row spawn-header">
         <div>
           <div className="section-index-tag">02 / Career Trajectory</div>
           <h2 id="journey-heading" className="section-display-title">
@@ -124,7 +155,7 @@ export function ExperienceJourney() {
       </div>
 
       {/* Quick Chapter Navigation & Order Toggle */}
-      <div className="journey-toolbar">
+      <div className="journey-toolbar spawn-toolbar">
         <div
           className="journey-chapter-pills"
           role="tablist"
@@ -177,15 +208,20 @@ export function ExperienceJourney() {
               idx <= activeIndex ||
               spineProgress >= (idx + 0.5) / milestones.length;
 
+            const isSpawned = Boolean(spawnedIds[item.id]);
+
             return (
               <article
                 key={item.id}
+                data-milestone-id={item.id}
                 ref={(el) => {
                   itemRefs.current[idx] = el;
                 }}
                 className={`journey-milestone-row ${
-                  isActive ? "is-focused" : ""
-                } ${isPassed ? "is-passed" : ""}`}
+                  isSpawned ? "is-spawned" : ""
+                } ${isActive ? "is-focused" : ""} ${
+                  isPassed ? "is-passed" : ""
+                }`}
               >
                 {/* Timeline Node Marker */}
                 <div className="journey-node-column">
@@ -218,8 +254,16 @@ export function ExperienceJourney() {
 
                     {/* Key Quantified Metrics */}
                     <div className="journey-metrics-cluster">
-                      {item.metrics.map((metric) => (
-                        <div key={metric.label} className="journey-stat-chip">
+                      {item.metrics.map((metric, mIdx) => (
+                        <div
+                          key={metric.label}
+                          className="journey-stat-chip"
+                          style={
+                            {
+                              "--item-idx": mIdx,
+                            } as React.CSSProperties
+                          }
+                        >
                           <div className="journey-stat-val">{metric.value}</div>
                           <div className="journey-stat-lbl">{metric.label}</div>
                         </div>
@@ -231,8 +275,16 @@ export function ExperienceJourney() {
 
                   {/* Concise Summarized Impact Pillars */}
                   <div className="journey-highlights-grid">
-                    {item.highlights.map((hl) => (
-                      <div key={hl.title} className="journey-highlight-box">
+                    {item.highlights.map((hl, hlIdx) => (
+                      <div
+                        key={hl.title}
+                        className="journey-highlight-box"
+                        style={
+                          {
+                            "--item-idx": hlIdx,
+                          } as React.CSSProperties
+                        }
+                      >
                         <h4 className="journey-highlight-title">{hl.title}</h4>
                         <p className="journey-highlight-detail">{hl.detail}</p>
                       </div>
@@ -241,8 +293,16 @@ export function ExperienceJourney() {
 
                   {/* Stack Pills */}
                   <div className="journey-stack-row">
-                    {item.stack.map((tech) => (
-                      <span key={tech} className="journey-tech-pill">
+                    {item.stack.map((tech, tIdx) => (
+                      <span
+                        key={tech}
+                        className="journey-tech-pill"
+                        style={
+                          {
+                            "--item-idx": tIdx,
+                          } as React.CSSProperties
+                        }
+                      >
                         {tech}
                       </span>
                     ))}

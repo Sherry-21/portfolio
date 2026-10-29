@@ -36,6 +36,10 @@ export const metadata: Metadata = {
   title: "Antonio Ryanlie — Fullstack Software Engineer",
   description:
     "Portfolio of Antonio Ryanlie — Fullstack Engineer at Indomobil Group & former Fullstack Engineer at Blibli.com.",
+  icons: {
+    icon: "/computer-logo.svg",
+    shortcut: "/computer-logo.svg",
+  },
 };
 
 export default function RootLayout({

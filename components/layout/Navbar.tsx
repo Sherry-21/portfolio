@@ -2,12 +2,14 @@
 
 import { useEffect, useState } from "react";
 import { PROFILE_DATA } from "@/data/portfolioData";
+import { smoothScrollToSection } from "@/utils/smoothScroll";
 
 const NAV_ITEMS = [
-  { id: "about", label: "Introduction" },
+  { id: "about", label: "Home" },
   { id: "skills", label: "Skills" },
   { id: "journey", label: "Experience" },
   { id: "credentials", label: "Credentials" },
+  { id: "contact", label: "Contact" },
 ];
 
 export function Navbar() {
@@ -33,19 +35,57 @@ export function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  const handleNavClick = (
+    e: React.MouseEvent<HTMLAnchorElement>,
+    id: string
+  ) => {
+    e.preventDefault();
+    setActiveId(id);
+    void smoothScrollToSection(id, "start");
+  };
+
   return (
-    <header className="luxury-navbar">
-      <a href="#about" className="brand-mark">
-        <span className="brand-diamond" aria-hidden="true" />
-        <span>{PROFILE_DATA.handle}</span>
+    <header className="hero-top-navbar">
+      <a
+        href="#about"
+        onClick={(e) => handleNavClick(e, "about")}
+        className="brand-mark"
+      >
+        <svg
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="var(--gold-primary)"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden="true"
+        >
+          <rect x="2" y="3" width="20" height="14" rx="2" />
+          <path d="M8 9l3 2.5L8 14" stroke="var(--gold-champagne)" />
+          <line
+            x1="13"
+            y1="14"
+            x2="16"
+            y2="14"
+            stroke="var(--gold-champagne)"
+          />
+          <line x1="8" y1="21" x2="16" y2="21" />
+          <line x1="12" y1="17" x2="12" y2="21" />
+        </svg>
+        <span className="brand-monogram">
+          AR<span className="brand-dot-accent">.</span>
+        </span>
       </a>
 
-      <nav className="nav-pill-bar" aria-label="Primary Navigation">
+      <nav className="hero-nav-links" aria-label="Primary Navigation">
         {NAV_ITEMS.map((item) => (
           <a
             key={item.id}
             href={`#${item.id}`}
-            className={`nav-link-item ${activeId === item.id ? "active" : ""}`}
+            onClick={(e) => handleNavClick(e, item.id)}
+            className={`hero-nav-item ${activeId === item.id ? "active" : ""}`}
           >
             {item.label}
           </a>
@@ -54,15 +94,11 @@ export function Navbar() {
 
       <div className="nav-right-actions">
         <a
-          href={PROFILE_DATA.githubUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="nav-subtle-link"
+          href={PROFILE_DATA.cvUrl}
+          download="Antonio_Ryanlie_CV.pdf"
+          className="nav-gold-cta"
         >
-          GitHub
-        </a>
-        <a href="#contact" className="nav-gold-cta">
-          Contact
+          Download CV
         </a>
       </div>
     </header>

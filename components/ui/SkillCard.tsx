@@ -5,6 +5,8 @@ import type { SkillItem } from "@/data/portfolioData";
 
 interface SkillCardProps {
   skill: SkillItem;
+  index: number;
+  isSpawned: boolean;
   onActivate: (telemetry: string) => void;
 }
 
@@ -19,10 +21,16 @@ interface SpawnedEntity {
   label: string | null;
 }
 
-export function SkillCard({ skill, onActivate }: SkillCardProps) {
+export function SkillCard({
+  skill,
+  index,
+  isSpawned,
+  onActivate,
+}: SkillCardProps) {
   const cardRef = useRef<HTMLElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const isHoveredRef = useRef(false);
+  const hasFiredSpawnBurstRef = useRef(false);
   const mousePosRef = useRef({ x: 150, y: 120 });
   const entitiesRef = useRef<SpawnedEntity[]>([]);
 
@@ -47,6 +55,25 @@ export function SkillCard({ skill, onActivate }: SkillCardProps) {
       entitiesRef.current.splice(0, entitiesRef.current.length - 42);
     }
   };
+
+  // Fire a one-time gold particle burst synchronized with the card's staggered spawn delay
+  useEffect(() => {
+    if (!isSpawned || hasFiredSpawnBurstRef.current) return;
+    hasFiredSpawnBurstRef.current = true;
+
+    const card = cardRef.current;
+    const burstTimer = setTimeout(() => {
+      if (!card) return;
+      const rect = card.getBoundingClientRect();
+      spawnBurst(
+        Math.max(120, rect.width * 0.52),
+        Math.max(90, rect.height * 0.44),
+        12
+      );
+    }, index * 85 + 220);
+
+    return () => clearTimeout(burstTimer);
+  }, [isSpawned, index, skill]);
 
   useEffect(() => {
     const card = cardRef.current;
@@ -79,7 +106,6 @@ export function SkillCard({ skill, onActivate }: SkillCardProps) {
       const isHovered = isHoveredRef.current;
       tick += isHovered ? 0.06 : 0.016;
 
-      // Simulation effects
       const simType = skill.simType;
       if (simType === "golang") {
         for (let lane = 0; lane < 4; lane++) {
@@ -147,7 +173,7 @@ export function SkillCard({ skill, onActivate }: SkillCardProps) {
           ctx.moveTo(x, 20);
           ctx.lineTo(x, height - 20);
           ctx.stroke();
-          const markerY = (tick * 40 + i * 50) % (height - 40) + 20;
+          const markerY = ((tick * 40 + i * 50) % (height - 40)) + 20;
           ctx.fillStyle = paleGold;
           ctx.globalAlpha = isHovered ? 0.7 : 0.2;
           ctx.fillRect(x - 3, markerY, 6, 12);
@@ -188,7 +214,6 @@ export function SkillCard({ skill, onActivate }: SkillCardProps) {
         ctx.stroke();
       }
 
-      // Spawned hover particles
       if (isHovered && Math.random() < 0.14) {
         spawnBurst(
           width * (0.2 + Math.random() * 0.6),
@@ -279,7 +304,12 @@ export function SkillCard({ skill, onActivate }: SkillCardProps) {
       onMouseLeave={handleMouseLeave}
       onFocus={handleFocus}
       onBlur={handleMouseLeave}
-      className="skill-card"
+      style={
+        {
+          "--spawn-delay": `${index * 85}ms`,
+        } as React.CSSProperties
+      }
+      className={`skill-card spawn-item ${isSpawned ? "is-spawned" : ""}`}
     >
       <canvas
         ref={canvasRef}
