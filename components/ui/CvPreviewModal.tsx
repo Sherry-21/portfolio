@@ -55,7 +55,7 @@ export function CvPreviewModal({ dialogRef }: CvPreviewModalProps) {
           <div className="cv-modal-actions">
             <a
               href={PROFILE_DATA.cvUrl}
-              download="Antonio_Ryanlie_CV.pdf"
+              download="antonio_ryanlie_resume.pdf"
               className="btn-gold-sm"
             >
               Download PDF

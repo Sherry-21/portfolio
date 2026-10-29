@@ -59,14 +59,14 @@ export const PROFILE_DATA = {
   headlineAccent: "Resilient Systems",
   headlineBottom: "With Precision.",
   bio: "I am a passionate software engineer and enthusiastic fast learner, eager to explore new technologies and tackle complex problems through innovative, effective solutions. I can make anything happen.",
-  email: "antonioryanlie1@gmail.com",
+  email: "antonioryanlie21@gmail.com",
   phone: "085311169058",
   whatsappUrl: "https://wa.me/6285311169058",
   linkedinUrl: "https://www.linkedin.com/in/antonio-ryanlie/",
   linkedinDisplay: "linkedin.com/in/antonio-ryanlie",
   githubUrl: "https://github.com/sherry-21",
   githubDisplay: "github.com/sherry-21",
-  cvUrl: "/assets/Antonio_Ryanlie_CV.pdf",
+  cvUrl: "/assets/antonio_ryanlie_resume.pdf",
   portraitCutout: "/assets/profile_cutout_hd.png",
 };
 

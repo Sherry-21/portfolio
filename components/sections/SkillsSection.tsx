@@ -75,10 +75,6 @@ export function SkillsSection() {
             Core Engineering Stack
           </h2>
         </div>
-        <p className="section-lead-text">
-          Hover over any capability block to trigger a live simulation of how I
-          apply that technology across production architectures.
-        </p>
       </div>
 
       {/* Pre-rendered Skill Cards Grid (Cascades into view when scrolled to) */}

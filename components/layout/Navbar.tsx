@@ -95,7 +95,7 @@ export function Navbar() {
       <div className="nav-right-actions">
         <a
           href={PROFILE_DATA.cvUrl}
-          download="Antonio_Ryanlie_CV.pdf"
+          download="antonio_ryanlie_resume.pdf"
           className="nav-gold-cta"
         >
           Download CV

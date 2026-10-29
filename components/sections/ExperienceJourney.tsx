@@ -207,12 +207,6 @@ export function ExperienceJourney() {
             The Engineering Journey
           </h2>
         </div>
-        <p className="section-lead-text">
-          Scroll to trace my progression across enterprise microservices at{" "}
-          <strong>Indomobil Group</strong>, high-scale e-commerce at{" "}
-          <strong>Blibli.com</strong>, and technical mentorship at{" "}
-          <strong>Dacode</strong>.
-        </p>
       </div>
 
       {/* Quick Chapter Navigation & Order Toggle */}
