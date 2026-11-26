@@ -66,7 +66,7 @@ export const PROFILE_DATA = {
   linkedinDisplay: "linkedin.com/in/antonio-ryanlie",
   githubUrl: "https://github.com/sherry-21",
   githubDisplay: "github.com/sherry-21",
-  cvUrl: "/assets/Resume_Antonio_Ryanlie.pdf",
+  cvUrl: "/assets/resume_antonio_ryanlie.pdf",
   portraitCutout: "/assets/profile_cutout_hd.png",
 };
 
