@@ -46,7 +46,7 @@ export function CvPreviewModal({ dialogRef }: CvPreviewModalProps) {
         <div className="cv-modal-header">
           <div>
             <h2 id="cv-modal-title" className="cv-modal-title">
-              {PROFILE_DATA.name} — Curriculum Vitae
+              {PROFILE_DATA.name} • Curriculum Vitae
             </h2>
             <p className="cv-modal-subtitle">
               Fullstack Engineer • Indomobil Group &amp; Blibli.com

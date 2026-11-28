@@ -33,9 +33,9 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Antonio Ryanlie — Fullstack Software Engineer",
+  title: "Antonio Ryanlie | Fullstack Software Engineer",
   description:
-    "Portfolio of Antonio Ryanlie — Fullstack Engineer at Indomobil Group & former Fullstack Engineer at Blibli.com.",
+    "Portfolio of Antonio Ryanlie, Fullstack Engineer at Indomobil Group and former Fullstack Engineer Intern at Blibli.com.",
   icons: {
     icon: "/computer-logo.svg",
     shortcut: "/computer-logo.svg",

@@ -38,7 +38,7 @@ export function CredentialsSection() {
           <div className="edu-org-block">
             <div className="edu-org-eyebrow">Organisational Experience</div>
             <h4 className="edu-org-title">
-              Binus University — {EDUCATION_DATA.organisationalRole}
+              Binus University • {EDUCATION_DATA.organisationalRole}
             </h4>
             <p className="edu-org-desc">{EDUCATION_DATA.organisationalDesc}</p>
           </div>
