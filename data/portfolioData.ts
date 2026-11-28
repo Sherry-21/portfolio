@@ -281,7 +281,7 @@ export const EXPERIENCE_JOURNEY: JourneyMilestone[] = [
   {
     id: "dacode",
     chapter: "CHAPTER I",
-    company: "Dacode & Binus University",
+    company: "Dacode",
     role: "Founder and Mentor",
     period: "Sep 2022 to Jan 2025",
     location: "Tangerang, Indonesia",
